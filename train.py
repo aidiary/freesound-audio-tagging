@@ -30,7 +30,7 @@ def train(train_loader, model, criterion, optimizer):
     correct = 0
     total = 0
 
-    for batch_idx, (data, target) in tqdm(enumerate(train_loader)):
+    for batch_idx, (data, target) in tqdm(enumerate(train_loader), total=len(train_loader), desc='train'):
         data, target = data.to(device), target.to(device)
 
         optimizer.zero_grad()
@@ -60,7 +60,7 @@ def test(test_loader, model, criterion):
     total = 0
 
     with torch.no_grad():
-        for batch_idx, (data, target) in tqdm(enumerate(test_loader)):
+        for batch_idx, (data, target) in tqdm(enumerate(test_loader), total=len(test_loader), desc='test'):
             data, target = data.to(device), target.to(device)
 
             outputs = model(data)
@@ -155,12 +155,13 @@ def main():
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
 
     best_acc = 0.0
-    writer = SummaryWriter
+    writer = SummaryWriter(args.log_dir)
 
     for epoch in range(1, args.epochs + 1):
         loss, acc = train(train_loader, model, criterion, optimizer)
         val_loss, val_acc = test(val_loader, model, criterion)
 
+        print(loss, acc)
         # logging
         writer.add_scalar('train/loss', loss, epoch)
         writer.add_scalar('train/acc', acc, epoch)
