@@ -88,21 +88,12 @@ class VGG11(nn.Module):
         self.fc2 = nn.Linear(512, self.num_classes)
 
     def forward(self, x):
-        print(x.size())
         x = self.block1(x)
-        print(x.size())
         x = self.block2(x)
-        print(x.size())
         x = self.block3(x)
-        print(x.size())
         x = self.block4(x)
-        print(x.size())
         x = self.block5(x)
-        print(x.size())
         x = x.view(x.size(0), -1)
-        print(x.size())
         x = self.fc1(x)
-        print(x.size())
         x = self.fc2(x)
-        print(x.size())
         return x
