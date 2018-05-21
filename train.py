@@ -150,7 +150,8 @@ def main():
     elif args.arch == 'VGG11':
         model = VGG11(num_classes)
     else:
-        model = LeNet(num_classes)
+        print('ERROR: not found model %s' % args.arch)
+        exit(1)
     model = model.to(device)
 
     criterion = nn.CrossEntropyLoss()
