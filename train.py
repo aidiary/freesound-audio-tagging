@@ -161,7 +161,6 @@ def main():
         loss, acc = train(train_loader, model, criterion, optimizer)
         val_loss, val_acc = test(val_loader, model, criterion)
 
-        print(loss, acc)
         # logging
         writer.add_scalar('train/loss', loss, epoch)
         writer.add_scalar('train/acc', acc, epoch)
