@@ -21,7 +21,7 @@ if cuda:
     print('cuda available!')
 
 device = torch.device('cuda' if cuda else 'cpu')
-num_workers = 8
+num_workers = 16
 
 
 def train(train_loader, model, criterion, optimizer):
@@ -157,6 +157,8 @@ def main():
     best_acc = 0.0
     writer = SummaryWriter(args.log_dir)
 
+    model_file = None
+
     for epoch in range(1, args.epochs + 1):
         loss, acc = train(train_loader, model, criterion, optimizer)
         val_loss, val_acc = test(val_loader, model, criterion)
@@ -173,9 +175,13 @@ def main():
         if val_acc > best_acc:
             print('val_acc improved from %.5f to %.5f' % (best_acc, val_acc))
             best_acc = val_acc
-            model_file = 'epoch%03d-%.3f-%.3f.pth' % (epoch, val_loss, val_acc)
-            torch.save(model.state_dict(),
-                       os.path.join(args.log_dir, model_file))
+
+            # remove the old model file
+            if model_file is not None:
+                os.remove(model_file)
+
+            model_file = os.path.join(args.log_dir, 'epoch%03d-%.3f-%.3f.pth' % (epoch, val_loss, val_acc))
+            torch.save(model.state_dict(), model_file)
 
 
 if __name__ == '__main__':
