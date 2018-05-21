@@ -21,7 +21,7 @@ if cuda:
     print('cuda available!')
 
 device = torch.device('cuda' if cuda else 'cpu')
-num_workers = 0
+num_workers = 8
 
 
 def train(train_loader, model, criterion, optimizer):
