@@ -59,6 +59,12 @@ class AudioDataset(torch.utils.data.Dataset):
         mel = np.resize(mel, (1, mel.shape[0], mel.shape[1]))
         tensor = torch.from_numpy(mel).float()
 
+        mean = tensor.mean()
+        std = tensor.std()
+        if std != 0:
+            tensor.add_(- mean)
+            tensor.div_(std)
+
         if self.test:
             # テストモードのときは正解ラベルがないのでデータだけ返す
             return tensor
