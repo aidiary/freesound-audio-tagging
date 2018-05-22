@@ -26,12 +26,13 @@ def random_crop(y, max_length=176400):
 
 class AudioDataset(torch.utils.data.Dataset):
 
-    def __init__(self, df, wav_dir, sr=None, max_length=4.0, window_size=0.02, hop_size=0.01, n_mels=64):
+    def __init__(self, df, wav_dir, test=False, sr=None, max_length=4.0, window_size=0.02, hop_size=0.01, n_mels=64):
         if not os.path.exists(wav_dir):
             print('ERROR: not found %s' % wav_dir)
             exit(1)
         self.df = df
         self.wav_dir = wav_dir
+        self.test = test
         self.sr = sr
         self.max_length = max_length     # sec
         self.window_size = window_size   # sec
@@ -46,15 +47,19 @@ class AudioDataset(torch.utils.data.Dataset):
         y, sr = librosa.load(fpath, sr=self.sr)
         y = random_crop(y, int(self.max_length * sr))
 
-        # feature
+        # 特徴抽出
         n_fft = int(self.window_size * sr)
         hop_length = int(self.hop_size * sr)
         mel = librosa.feature.melspectrogram(y=y, sr=sr, n_fft=n_fft, hop_length=hop_length, n_mels=self.n_mels)
-        # (channel, features, frames)
+        # Conv2Dの場合は (channel, features, frames)
         mel = np.resize(mel, (1, mel.shape[0], mel.shape[1]))
         tensor = torch.from_numpy(mel).float()
 
-        # label
-        label = self.df.label_idx[index]
+        if self.test:
+            # テストモードのときは正解ラベルがないのでデータだけ返す
+            return tensor
+        else:
+            # label
+            label = self.df.label_idx[index]
 
-        return tensor, label
+            return tensor, label
