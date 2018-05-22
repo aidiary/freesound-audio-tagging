@@ -11,7 +11,7 @@ import torch.optim as optim
 from torch.utils.data.sampler import SubsetRandomSampler
 
 from dataset import AudioDataset
-from model import LeNet, VGG11
+from model import LeNet, VGG9
 from tensorboardX import SummaryWriter
 from tqdm import tqdm
 
@@ -147,8 +147,8 @@ def main():
     # build model
     if args.arch == 'LeNet':
         model = LeNet(num_classes)
-    elif args.arch == 'VGG11':
-        model = VGG11(num_classes)
+    elif args.arch == 'VGG9':
+        model = VGG9(num_classes)
     else:
         model = LeNet(num_classes)
     model = model.to(device)
