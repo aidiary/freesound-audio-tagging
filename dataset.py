@@ -45,6 +45,10 @@ class AudioDataset(torch.utils.data.Dataset):
     def __getitem__(self, index):
         fpath = os.path.join(self.wav_dir, self.df.fname[index])
         y, sr = librosa.load(fpath, sr=self.sr)
+        if sr is None:
+            print('WARNING:', fpath)
+            sr = 44100
+
         y = random_crop(y, int(self.max_length * sr))
 
         # 特徴抽出
