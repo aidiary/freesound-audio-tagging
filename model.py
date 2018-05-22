@@ -12,13 +12,15 @@ class LeNet(nn.Module):
         self.block1 = nn.Sequential(
             nn.Conv2d(1, 20, kernel_size=5),
             nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2)
+            nn.MaxPool2d(kernel_size=2, stride=2),
+            nn.BatchNorm2d(20)
         )
 
         self.block2 = nn.Sequential(
             nn.Conv2d(20, 20, kernel_size=5),
             nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2)
+            nn.MaxPool2d(kernel_size=2, stride=2),
+            nn.BatchNorm2d(20)
         )
 
         self.fc1 = nn.Linear(25220, 1000)
