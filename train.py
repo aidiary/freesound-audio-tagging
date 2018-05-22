@@ -214,7 +214,7 @@ def main():
     print('best_model:', best_model)
     model.load_state_dict(torch.load(best_model, map_location=lambda storage, loc: storage))
     predictions = test(test_loader, model)
-    np.save(os.path.join(args.log_dir, 'predictions.npy'), predictions.numpy())
+    np.save(os.path.join(args.log_dir, 'predictions.npy'), predictions.cpu().numpy())
 
     # Top3の出力を持つラベルに変換
     _, indices = predictions.topk(3)  # (N, 3)
