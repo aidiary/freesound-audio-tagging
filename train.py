@@ -9,6 +9,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data.sampler import SubsetRandomSampler
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 from dataset import AudioDataset
 from model import LeNet
@@ -180,6 +181,7 @@ def main():
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
+    scheduler = ReduceLROnPlateau(optimizer, patience=5)
 
     best_acc = 0.0
     best_model = None
@@ -188,6 +190,8 @@ def main():
     for epoch in range(1, args.epochs + 1):
         loss, acc = train(train_loader, model, criterion, optimizer)
         val_loss, val_acc = valid(val_loader, model, criterion)
+
+        scheduler.step(val_loss)
 
         # logging
         writer.add_scalar('train/loss', loss, epoch)
