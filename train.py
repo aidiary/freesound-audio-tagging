@@ -105,7 +105,7 @@ def main():
                         help='the ratio of validation data')
     parser.add_argument('--arch', default='LeNet',
                         help='network architecture: LeNet')
-    parser.add_argument('--epochs', type=int, default=100, metavar='N',
+    parser.add_argument('--epochs', type=int, default=32, metavar='N',
                         help='number of epochs to train')
     parser.add_argument('--lr', type=float, default=0.001, metavar='LR',
                         help='learning rate')
