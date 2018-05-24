@@ -2,10 +2,10 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-class LeNet(nn.Module):
+class AlexNet(nn.Module):
 
     def __init__(self, num_classes):
-        super(LeNet, self).__init__()
+        super(AlexNet, self).__init__()
 
         self.num_classes = num_classes
 

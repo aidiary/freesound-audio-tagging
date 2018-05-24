@@ -12,7 +12,7 @@ from torch.utils.data.sampler import SubsetRandomSampler
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 from dataset import AudioDataset
-from model import LeNet
+from model import AlexNet
 from tensorboardX import SummaryWriter
 from tqdm import tqdm
 
@@ -172,8 +172,8 @@ def main():
     )
 
     # build model
-    if args.arch == 'LeNet':
-        model = LeNet(num_classes)
+    if args.arch == 'AlexNet':
+        model = AlexNet(num_classes)
     else:
         print('ERROR: not found model %s' % args.arch)
         exit(1)
