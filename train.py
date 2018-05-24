@@ -104,8 +104,6 @@ def main():
                         help='training and valid batch size')
     parser.add_argument('--valid_ratio', type=float, default=0.1, metavar='VR',
                         help='the ratio of validation data')
-    parser.add_argument('--arch', default='LeNet',
-                        help='network architecture: LeNet')
     parser.add_argument('--epochs', type=int, default=32, metavar='N',
                         help='number of epochs to train')
     parser.add_argument('--lr', type=float, default=0.001, metavar='LR',
@@ -172,11 +170,7 @@ def main():
     )
 
     # build model
-    if args.arch == 'AlexNet':
-        model = AlexNet(num_classes)
-    else:
-        print('ERROR: not found model %s' % args.arch)
-        exit(1)
+    model = AlexNet(num_classes)
     model = model.to(device)
 
     criterion = nn.CrossEntropyLoss()
