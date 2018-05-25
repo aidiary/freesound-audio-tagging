@@ -9,12 +9,14 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data.sampler import SubsetRandomSampler
-from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 from dataset import AudioDataset
 from model import AlexNet
 from tensorboardX import SummaryWriter
 from tqdm import tqdm
+
+# https://github.com/automan000/CyclicLR_Scheduler_PyTorch
+from cyclic_lr_scheduler import CyclicLR
 
 
 cuda = torch.cuda.is_available()
@@ -175,7 +177,11 @@ def main():
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
-    scheduler = ReduceLROnPlateau(optimizer, patience=5)
+
+    scheduler = CyclicLR(optimizer, base_lr=0.0001, max_lr=0.01, step_size=10, mode="exp_range")
+
+    # 学習率の履歴を保存（可視化用）
+    lr_list = []
 
     best_acc = 0.0
     best_model = None
@@ -185,7 +191,8 @@ def main():
         loss, acc = train(train_loader, model, criterion, optimizer)
         val_loss, val_acc = valid(val_loader, model, criterion)
 
-        scheduler.step(val_loss)
+        lr_list.append(scheduler.get_lr()[0])
+        scheduler.step()
 
         # logging
         writer.add_scalar('train/loss', loss, epoch)
@@ -206,6 +213,14 @@ def main():
 
             best_model = os.path.join(args.log_dir, 'epoch%03d-%.3f-%.3f.pth' % (epoch, val_loss, val_acc))
             torch.save(model.state_dict(), best_model)
+
+    # 学習率を可視化
+    # import matplotlib.pyplot as plt
+    # print(lr_list)
+    # plt.plot(lr_list)
+    # plt.xlabel('epoch')
+    # plt.ylabel('learning rate')
+    # plt.show()
 
     # ベストモデルでテストデータを評価
     # あとでEnsembleできるようにモデルの出力値も保存しておく
