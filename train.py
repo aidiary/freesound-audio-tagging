@@ -9,7 +9,6 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data.sampler import SubsetRandomSampler
-from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 from dataset import AudioDataset
 from model import AlexNet
