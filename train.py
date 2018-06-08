@@ -98,6 +98,26 @@ def test(test_loader, model):
     return predictions
 
 
+def test_time_augmentation(test_loader, model, num_aug=5):
+    model.eval()
+
+    with torch.no_grad():
+        tta_predictions = None
+        for i in range(num_aug):
+            predictions = []
+            for batch_idx, data in enumerate(test_loader):
+                data = data.to(device)
+                output = model(data)
+                predictions.append(output)
+            predictions = torch.cat(predictions, dim=0)
+            if tta_predictions is None:
+                tta_predictions = torch.zeros_like(predictions)
+            tta_predictions += predictions
+
+    tta_predictions /= num_aug
+    return tta_predictions
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--log_dir', type=str, default='logs', metavar='LD',
@@ -213,14 +233,6 @@ def main():
 
             best_model = os.path.join(args.log_dir, 'epoch%03d-%.3f-%.3f.pth' % (epoch, val_loss, val_acc))
             torch.save(model.state_dict(), best_model)
-
-    # 学習率を可視化
-    # import matplotlib.pyplot as plt
-    # print(lr_list)
-    # plt.plot(lr_list)
-    # plt.xlabel('epoch')
-    # plt.ylabel('learning rate')
-    # plt.show()
 
     # ベストモデルでテストデータを評価
     # あとでEnsembleできるようにモデルの出力値も保存しておく
