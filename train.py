@@ -105,7 +105,7 @@ def test_time_augmentation(test_loader, model, num_aug=5):
         tta_predictions = None
         for i in range(num_aug):
             predictions = []
-            for batch_idx, data in enumerate(test_loader):
+            for batch_idx, data in tqdm(enumerate(test_loader), total=len(test_loader), desc='test'):
                 data = data.to(device)
                 output = model(data)
                 predictions.append(output)
