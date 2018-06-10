@@ -55,8 +55,7 @@ class AudioDataset(torch.utils.data.Dataset):
         n_fft = int(self.window_size * sr)
         hop_length = int(self.hop_size * sr)
         mfcc = librosa.feature.mfcc(y=y, sr=sr, n_fft=n_fft, hop_length=hop_length, n_mfcc=self.n_mfcc)
-        # Conv2Dの場合は (channel, features, frames)
-        mfcc = np.resize(mfcc, (1, mfcc.shape[0], mfcc.shape[1]))
+        mfcc = np.resize(mfcc, (mfcc.shape[0], mfcc.shape[1]))
         tensor = torch.from_numpy(mfcc).float()
 
         mean = tensor.mean()

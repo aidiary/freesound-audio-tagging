@@ -11,7 +11,7 @@ import torch.optim as optim
 from torch.utils.data.sampler import SubsetRandomSampler
 
 from dataset import AudioDataset
-from model import AlexNet2d
+from model import AlexNet1d
 from tensorboardX import SummaryWriter
 from tqdm import tqdm
 
@@ -192,7 +192,7 @@ def main():
     )
 
     # build model
-    model = AlexNet2d(num_classes)
+    model = AlexNet1d(num_classes)
     model = model.to(device)
 
     criterion = nn.CrossEntropyLoss()
