@@ -26,7 +26,9 @@ def random_crop(y, max_length=176400):
 
 class AudioDataset(torch.utils.data.Dataset):
 
-    def __init__(self, df, wav_dir, test=False, sr=None, max_length=4.0, window_size=0.02, hop_size=0.01, n_mfcc=64):
+    def __init__(self, df, wav_dir, test=False,
+                 sr=None, max_length=4.0, window_size=0.02, hop_size=0.01,
+                 n_feature=64, feature='mfcc', conv_type='2d'):
         if not os.path.exists(wav_dir):
             print('ERROR: not found %s' % wav_dir)
             exit(1)
@@ -37,7 +39,9 @@ class AudioDataset(torch.utils.data.Dataset):
         self.max_length = max_length     # sec
         self.window_size = window_size   # sec
         self.hop_size = hop_size         # sec
-        self.n_mfcc = n_mfcc
+        self.n_feature = n_feature
+        self.feature = feature
+        self.conv_type = conv_type
 
     def __len__(self):
         return len(self.df)
@@ -49,27 +53,45 @@ class AudioDataset(torch.utils.data.Dataset):
             print('WARNING:', fpath)
             sr = 44100
 
+        # ランダムクロップ
         y = random_crop(y, int(self.max_length * sr))
 
         # 特徴抽出
         n_fft = int(self.window_size * sr)
         hop_length = int(self.hop_size * sr)
-        mfcc = librosa.feature.mfcc(y=y, sr=sr, n_fft=n_fft, hop_length=hop_length, n_mfcc=self.n_mfcc)
-        # Conv2Dの場合は (channel, features, frames)
-        mfcc = np.resize(mfcc, (1, mfcc.shape[0], mfcc.shape[1]))
-        tensor = torch.from_numpy(mfcc).float()
 
-        mean = tensor.mean()
-        std = tensor.std()
+        if self.feature == 'mfcc':
+            feature = librosa.feature.mfcc(y=y, sr=sr, n_fft=n_fft, hop_length=hop_length, n_mfcc=self.n_feature)
+        elif self.feature == 'melgram':
+            feature = librosa.feature.melspectrogram(y, sr=sr, n_fft=n_fft, hop_length=hop_length, n_mels=self.n_feature)
+        else:
+            print('Invalid feature name: %s' % self.feature)
+            exit(1)
+
+        data = torch.from_numpy(feature).float()
+        s = data.size()
+
+        if self.conv_type == '2d':
+            # Conv2dの場合は (channel, features, frames)
+            data.resize_(1, s[0], s[1])
+        elif self.conv_type == '1d':
+            # Conv1dの場合は (features, frames)
+            data.resize_(s[0], s[1])
+        else:
+            print('Invalid conv type: %s' % self.conv_type)
+            exit(1)
+
+        mean = data.mean()
+        std = data.std()
         if std != 0:
-            tensor.add_(- mean)
-            tensor.div_(std)
+            data.add_(-mean)
+            data.div_(std)
 
         if self.test:
             # テストモードのときは正解ラベルがないのでデータだけ返す
-            return tensor
+            return data
         else:
             # label
             label = self.df.label_idx[index]
 
-            return tensor, label
+            return data, label

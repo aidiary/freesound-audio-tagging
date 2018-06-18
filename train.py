@@ -11,7 +11,7 @@ import torch.optim as optim
 from torch.utils.data.sampler import SubsetRandomSampler
 
 from dataset import AudioDataset
-from model import AlexNet2d
+from model import AlexNet2d, AlexNet1d
 from tensorboardX import SummaryWriter
 from tqdm import tqdm
 
@@ -120,20 +120,35 @@ def test_time_augmentation(test_loader, model, num_aug=5):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--log_dir', type=str, default='logs', metavar='LD',
+    parser.add_argument('--log_dir', type=str, default='logs',
                         help='output log directory')
-    parser.add_argument('--batch_size', type=int, default=128, metavar='N',
+    parser.add_argument('--feature', type=str,
+                        choices=['melgram', 'mfcc'], default='mfcc',
+                        help='feature')
+    parser.add_argument('--conv_type', type=str,
+                        choices=['1d', '2d'], default='2d',
+                        help='convolution type')
+    parser.add_argument('--batch_size', type=int, default=128,
                         help='training and valid batch size')
-    parser.add_argument('--valid_ratio', type=float, default=0.1, metavar='VR',
+    parser.add_argument('--valid_ratio', type=float, default=0.1,
                         help='the ratio of validation data')
-    parser.add_argument('--epochs', type=int, default=32, metavar='N',
+    parser.add_argument('--epochs', type=int, default=32,
                         help='number of epochs to train')
-    parser.add_argument('--lr', type=float, default=0.001, metavar='LR',
+    parser.add_argument('--lr', type=float, default=0.001,
                         help='learning rate')
-    parser.add_argument('--seed', type=int, default=1234, metavar='S',
+    parser.add_argument('--seed', type=int, default=1234,
                         help='random seed')
 
     args = parser.parse_args()
+
+    print('log_dir:', args.log_dir)
+    print('feature:', args.feature)
+    print('conv_type:', args.conv_type)
+    print('batch_size:', args.batch_size)
+    print('valid_ratio:', args.valid_ratio)
+    print('epochs:', args.epochs)
+    print('lr:', args.lr)
+    print('seed:', args.seed)
 
     # seed
     np.random.seed(args.seed)
@@ -153,8 +168,20 @@ def main():
 
     # Datasetをロード
     # test=Trueにするとラベルは読み込まれない
-    train_dataset = AudioDataset(train_df, './data/audio_train')
-    test_dataset = AudioDataset(test_df, './data/audio_test', test=True)
+    train_dataset = AudioDataset(
+        train_df,
+        './data/audio_train',
+        feature=args.feature,
+        conv_type=args.conv_type
+    )
+
+    test_dataset = AudioDataset(
+        test_df,
+        './data/audio_test',
+        test=True,
+        feature=args.feature,
+        conv_type=args.conv_type
+    )
 
     # 訓練データを訓練とバリデーションにランダムに分割
     # あとでCVによるEnsembleできるようにシードを指定する
@@ -192,8 +219,15 @@ def main():
     )
 
     # build model
-    model = AlexNet2d(num_classes)
-    model = model.to(device)
+    if args.conv_type == '2d':
+        model = AlexNet2d(num_classes).to(device)
+    elif args.conv_type == '1d':
+        model = AlexNet1d(num_classes).to(device)
+    else:
+        print('Invalid conv_type: %s' % args.conv_type)
+        exit(1)
+
+    print(model)
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
