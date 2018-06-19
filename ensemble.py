@@ -9,7 +9,7 @@ def softmax(x):
 
 
 pred_list = []
-for i in [30, 31, 32, 33]:
+for i in [34, 35, 36, 37]:
     pred = np.load('logs/log.%03d/predictions.npy' % i)
     pred = softmax(pred.T).T
     print(i, np.argmax(pred, axis=1))
