@@ -12,7 +12,7 @@ import torch.optim as optim
 from torch.utils.data.sampler import SubsetRandomSampler
 
 from dataset import AudioDataset
-from model import AlexNet2d, AlexNet1d
+from model import AlexNet2d, AlexNet1d, ConvLSTM
 from tensorboardX import SummaryWriter
 from tqdm import tqdm
 
@@ -127,7 +127,7 @@ def main():
                         choices=['melgram', 'mfcc'], default='mfcc',
                         help='feature')
     parser.add_argument('--conv_type', type=str,
-                        choices=['1d', '2d'], default='2d',
+                        choices=['1d', '2d', 'lstm'], default='2d',
                         help='convolution type')
     parser.add_argument('--batch_size', type=int, default=128,
                         help='training and valid batch size')
@@ -224,6 +224,8 @@ def main():
         model = AlexNet2d(num_classes).to(device)
     elif args.conv_type == '1d':
         model = AlexNet1d(num_classes).to(device)
+    elif args.conv_type == 'lstm':
+        model = ConvLSTM(num_classes).to(device)
     else:
         print('Invalid conv_type: %s' % args.conv_type)
         exit(1)

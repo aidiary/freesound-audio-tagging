@@ -74,7 +74,7 @@ class AudioDataset(torch.utils.data.Dataset):
         if self.conv_type == '2d':
             # Conv2dの場合は (channel, features, frames)
             data.resize_(1, s[0], s[1])
-        elif self.conv_type == '1d':
+        elif self.conv_type == '1d' or self.conv_type == 'lstm':
             # Conv1dの場合は (features, frames)
             data.resize_(s[0], s[1])
         else:
