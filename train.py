@@ -111,10 +111,9 @@ def test_time_augmentation(test_loader, model, num_aug=5):
                 predictions.append(output)
             predictions = torch.cat(predictions, dim=0)
             if tta_predictions is None:
-                tta_predictions = torch.zeros_like(predictions)
-            tta_predictions += predictions
-
-    tta_predictions /= num_aug
+                tta_predictions = torch.ones_like(predictions)
+            tta_predictions *= predictions
+    tta_predictions = tta_predictions ** (1.0 / num_aug)
     return tta_predictions
 
 
