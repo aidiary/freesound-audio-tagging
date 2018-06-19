@@ -10,34 +10,38 @@ class AlexNet2d(nn.Module):
 
         self.block1 = nn.Sequential(
             nn.Conv2d(1, 96, kernel_size=11, stride=(2, 3), padding=5),
+            nn.BatchNorm2d(96),
             nn.ReLU(inplace=True),
-            nn.MaxPool2d(kernel_size=3, stride=(1, 2)),
-            nn.BatchNorm2d(96)
+            nn.MaxPool2d(kernel_size=3, stride=(1, 2))
         )
 
         self.block2 = nn.Sequential(
             nn.Conv2d(96, 256, kernel_size=5, stride=(2, 3), padding=2),
+            nn.BatchNorm2d(256),
             nn.ReLU(inplace=True),
-            nn.MaxPool2d(kernel_size=3, stride=(2, 2)),
-            nn.BatchNorm2d(256)
+            nn.MaxPool2d(kernel_size=3, stride=(2, 2))
         )
 
         self.block3 = nn.Sequential(
             nn.Conv2d(256, 384, kernel_size=3, padding=1),
+            nn.BatchNorm2d(384),
             nn.ReLU(inplace=True),
             nn.Conv2d(384, 384, kernel_size=3, padding=1),
+            nn.BatchNorm2d(384),
             nn.ReLU(inplace=True),
             nn.Conv2d(384, 256, kernel_size=3, padding=1),
+            nn.BatchNorm2d(256),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=3, stride=(1, 2)),
-            nn.BatchNorm2d(256)
         )
 
         self.classifier = nn.Sequential(
             nn.Linear(256 * 5 * 4, 2048),
             nn.ReLU(inplace=True),
+            nn.Dropout(),
             nn.Linear(2048, 2048),
             nn.ReLU(inplace=True),
+            nn.Dropout(),
             nn.Linear(2048, self.num_classes)
         )
 
@@ -59,34 +63,38 @@ class AlexNet1d(nn.Module):
 
         self.block1 = nn.Sequential(
             nn.Conv1d(64, 96, kernel_size=11, stride=3, padding=5),
+            nn.BatchNorm1d(96),
             nn.ReLU(inplace=True),
-            nn.MaxPool1d(kernel_size=3, stride=2),
-            nn.BatchNorm1d(96)
+            nn.MaxPool1d(kernel_size=3, stride=2)
         )
 
         self.block2 = nn.Sequential(
             nn.Conv1d(96, 256, kernel_size=5, stride=3, padding=2),
+            nn.BatchNorm1d(256),
             nn.ReLU(inplace=True),
-            nn.MaxPool1d(kernel_size=3, stride=2),
-            nn.BatchNorm1d(256)
+            nn.MaxPool1d(kernel_size=3, stride=2)
         )
 
         self.block3 = nn.Sequential(
             nn.Conv1d(256, 384, kernel_size=3, padding=1),
+            nn.BatchNorm1d(384),
             nn.ReLU(inplace=True),
             nn.Conv1d(384, 384, kernel_size=3, padding=1),
+            nn.BatchNorm1d(384),
             nn.ReLU(inplace=True),
             nn.Conv1d(384, 256, kernel_size=3, padding=1),
+            nn.BatchNorm1d(256),
             nn.ReLU(inplace=True),
-            nn.MaxPool1d(kernel_size=3, stride=2),
-            nn.BatchNorm1d(256)
+            nn.MaxPool1d(kernel_size=3, stride=2)
         )
 
         self.classifier = nn.Sequential(
             nn.Linear(1024, 2048),
             nn.ReLU(inplace=True),
+            nn.Dropout(),
             nn.Linear(2048, 2048),
             nn.ReLU(inplace=True),
+            nn.Dropout(),
             nn.Linear(2048, self.num_classes)
         )
 
