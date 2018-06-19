@@ -23,6 +23,9 @@ def main():
                         help='input log directory')
     parser.add_argument('model_file', type=str,
                         help='input model file')
+    parser.add_argument('--feature', type=str,
+                        choices=['melgram', 'mfcc'], default='mfcc',
+                        help='feature')
     parser.add_argument('--conv_type', type=str,
                         choices=['1d', '2d'], default='2d',
                         help='convolution type of the model')
@@ -30,6 +33,7 @@ def main():
 
     print('log_dir:', args.log_dir)
     print('model_file:', args.model_file)
+    print('feature:', args.feature)
     print('conv_type:', args.conv_type)
 
     # load dataset
@@ -41,7 +45,14 @@ def main():
     train_df['label_idx'] = le.transform(train_df['label'])
     num_classes = len(le.classes_)
 
-    test_dataset = AudioDataset(test_df, './data/audio_test', test=True)
+    test_dataset = AudioDataset(
+        test_df,
+        './data/audio_test',
+        test=True,
+        feature=args.feature,
+        conv_type=args.conv_type
+    )
+
     test_loader = torch.utils.data.DataLoader(test_dataset, 128, shuffle=False)
 
     # load model

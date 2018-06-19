@@ -7,6 +7,7 @@ from sklearn.preprocessing import LabelEncoder
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import torch.optim as optim
 from torch.utils.data.sampler import SubsetRandomSampler
 
@@ -108,6 +109,7 @@ def test_time_augmentation(test_loader, model, num_aug=5):
             for batch_idx, data in tqdm(enumerate(test_loader), total=len(test_loader), desc='test'):
                 data = data.to(device)
                 output = model(data)
+                output = F.softmax(output, dim=1)
                 predictions.append(output)
             predictions = torch.cat(predictions, dim=0)
             if tta_predictions is None:
