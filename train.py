@@ -153,16 +153,6 @@ def main():
     print('lr:', args.lr)
     print('seed:', args.seed)
 
-    # logging parameters
-    experiment.log_parameter('log_dir:', args.log_dir)
-    experiment.log_parameter('feature:', args.feature)
-    experiment.log_parameter('conv_type:', args.conv_type)
-    experiment.log_parameter('batch_size:', args.batch_size)
-    experiment.log_parameter('valid_ratio:', args.valid_ratio)
-    experiment.log_parameter('epochs:', args.epochs)
-    experiment.log_parameter('lr:', args.lr)
-    experiment.log_parameter('seed:', args.seed)
-
     # seed
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
@@ -242,7 +232,6 @@ def main():
         print('Invalid conv_type: %s' % args.conv_type)
         exit(1)
 
-    experiment.set_model_graph(model)
     print(model)
 
     criterion = nn.CrossEntropyLoss()
