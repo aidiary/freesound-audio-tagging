@@ -3,6 +3,7 @@ import argparse
 import numpy as np
 import pandas as pd
 
+from comet_ml import Experiment
 from sklearn.preprocessing import LabelEncoder
 
 import torch
@@ -18,7 +19,6 @@ from tqdm import tqdm
 # https://github.com/automan000/CyclicLR_Scheduler_PyTorch
 from cyclic_lr_scheduler import CyclicLR
 
-from comet_ml import Experiment
 experiment = Experiment(api_key="tHRP1b8v4ZCrntHCJyu0xquwi",
                         project_name='freesound')
 
