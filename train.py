@@ -13,12 +13,14 @@ from torch.utils.data.sampler import SubsetRandomSampler
 
 from dataset import AudioDataset
 from model import AlexNet2d, AlexNet1d, ConvLSTM
-from tensorboardX import SummaryWriter
 from tqdm import tqdm
 
 # https://github.com/automan000/CyclicLR_Scheduler_PyTorch
 from cyclic_lr_scheduler import CyclicLR
 
+from comet_ml import Experiment
+experiment = Experiment(api_key="tHRP1b8v4ZCrntHCJyu0xquwi",
+                        project_name='freesound')
 
 cuda = torch.cuda.is_available()
 if cuda:
@@ -151,6 +153,16 @@ def main():
     print('lr:', args.lr)
     print('seed:', args.seed)
 
+    # logging parameters
+    experiment.log_parameter('log_dir:', args.log_dir)
+    experiment.log_parameter('feature:', args.feature)
+    experiment.log_parameter('conv_type:', args.conv_type)
+    experiment.log_parameter('batch_size:', args.batch_size)
+    experiment.log_parameter('valid_ratio:', args.valid_ratio)
+    experiment.log_parameter('epochs:', args.epochs)
+    experiment.log_parameter('lr:', args.lr)
+    experiment.log_parameter('seed:', args.seed)
+
     # seed
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
@@ -230,6 +242,7 @@ def main():
         print('Invalid conv_type: %s' % args.conv_type)
         exit(1)
 
+    experiment.set_model_graph(model)
     print(model)
 
     criterion = nn.CrossEntropyLoss()
@@ -242,20 +255,20 @@ def main():
 
     best_acc = 0.0
     best_model = None
-    writer = SummaryWriter(args.log_dir)
 
     for epoch in range(1, args.epochs + 1):
-        loss, acc = train(train_loader, model, criterion, optimizer)
-        val_loss, val_acc = valid(val_loader, model, criterion)
+        with experiment.train():
+            loss, acc = train(train_loader, model, criterion, optimizer)
+            experiment.log_metric('train/loss', loss, epoch)
+            experiment.log_metric('train/acc', acc, epoch)
+
+        with experiment.validate():
+            val_loss, val_acc = valid(val_loader, model, criterion)
+            experiment.log_metric('valid/loss', val_loss, epoch)
+            experiment.log_metric('valid/acc', val_acc, epoch)
 
         lr_list.append(scheduler.get_lr()[0])
         scheduler.step()
-
-        # logging
-        writer.add_scalar('train/loss', loss, epoch)
-        writer.add_scalar('train/acc', acc, epoch)
-        writer.add_scalar('valid/loss', val_loss, epoch)
-        writer.add_scalar('valid/acc', val_acc, epoch)
 
         print('Epoch [%d/%d] loss: %.5f acc: %.5f val_loss: %.5f val_acc: %.5f'
               % (epoch, args.epochs, loss, acc, val_loss, val_acc))
