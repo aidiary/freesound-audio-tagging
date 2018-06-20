@@ -14,6 +14,7 @@ from torch.utils.data.sampler import SubsetRandomSampler
 
 from dataset import AudioDataset
 from model import AlexNet2d, AlexNet1d, ConvLSTM
+from tensorboardX import SummaryWriter
 from tqdm import tqdm
 
 # https://github.com/automan000/CyclicLR_Scheduler_PyTorch
@@ -153,8 +154,6 @@ def main():
     print('lr:', args.lr)
     print('seed:', args.seed)
 
-    os.makedirs(args.log_dir, exist_ok=True)
-
     # seed
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
@@ -246,6 +245,7 @@ def main():
 
     best_acc = 0.0
     best_model = None
+    writer = SummaryWriter(args.log_dir)
 
     for epoch in range(1, args.epochs + 1):
         with experiment.train():
@@ -260,6 +260,12 @@ def main():
 
         lr_list.append(scheduler.get_lr()[0])
         scheduler.step()
+
+        # logging
+        writer.add_scalar('train/loss', loss, epoch)
+        writer.add_scalar('train/acc', acc, epoch)
+        writer.add_scalar('valid/loss', val_loss, epoch)
+        writer.add_scalar('valid/acc', val_acc, epoch)
 
         print('Epoch [%d/%d] loss: %.5f acc: %.5f val_loss: %.5f val_acc: %.5f'
               % (epoch, args.epochs, loss, acc, val_loss, val_acc))
