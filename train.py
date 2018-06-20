@@ -248,7 +248,6 @@ def main():
     best_model = None
 
     for epoch in range(1, args.epochs + 1):
-        experiment.log_current_epoch(epoch)
         with experiment.train():
             loss, acc = train(train_loader, model, criterion, optimizer)
             experiment.log_metric('loss', loss, epoch)
