@@ -153,6 +153,8 @@ def main():
     print('lr:', args.lr)
     print('seed:', args.seed)
 
+    os.makedirs(args.log_dir, exist_ok=True)
+
     # seed
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
@@ -249,13 +251,13 @@ def main():
         experiment.log_current_epoch(epoch)
         with experiment.train():
             loss, acc = train(train_loader, model, criterion, optimizer)
-            experiment.log_metric('train/loss', loss, epoch)
-            experiment.log_metric('train/acc', acc, epoch)
+            experiment.log_metric('loss', loss, epoch)
+            experiment.log_metric('acc', acc, epoch)
 
         with experiment.validate():
             val_loss, val_acc = valid(val_loader, model, criterion)
-            experiment.log_metric('valid/loss', val_loss, epoch)
-            experiment.log_metric('valid/acc', val_acc, epoch)
+            experiment.log_metric('loss', val_loss, epoch)
+            experiment.log_metric('acc', val_acc, epoch)
 
         lr_list.append(scheduler.get_lr()[0])
         scheduler.step()
