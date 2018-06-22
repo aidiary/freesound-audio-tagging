@@ -1,9 +1,9 @@
-python train.py --log_dir=logs/log.040 --seed 1234 --epochs 300 --feature mfcc --conv_type 2d
-python train.py --log_dir=logs/log.041 --seed 1234 --epochs 300 --feature mfcc --conv_type 1d
-python train.py --log_dir=logs/log.042 --seed 1234 --epochs 300 --feature melgram --conv_type 2d
-python train.py --log_dir=logs/log.043 --seed 1234 --epochs 300 --feature melgram --conv_type 1d
-python train.py --log_dir=logs/log.044 --seed 1234 --epochs 300 --feature mfcc --conv_type lstm
-python train.py --log_dir=logs/log.045 --seed 1234 --epochs 300 --feature melgram --conv_type lstm
+python train.py --log_dir=logs/log.040 --seed 1234 --epochs 150 --feature mfcc --conv_type 2d
+python train.py --log_dir=logs/log.041 --seed 1234 --epochs 150 --feature mfcc --conv_type 1d
+python train.py --log_dir=logs/log.042 --seed 1234 --epochs 150 --feature melgram --conv_type 2d
+python train.py --log_dir=logs/log.043 --seed 1234 --epochs 150 --feature melgram --conv_type 1d
+python train.py --log_dir=logs/log.044 --seed 1234 --epochs 150 --feature mfcc --conv_type lstm
+python train.py --log_dir=logs/log.045 --seed 1234 --epochs 150 --feature melgram --conv_type lstm
 
 # test time augmentation
 # python tta.py logs/log.040 logs/log.040/.pth --feature mfcc --conv_type 2d
