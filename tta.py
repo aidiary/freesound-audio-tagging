@@ -7,7 +7,7 @@ from sklearn.preprocessing import LabelEncoder
 import torch
 from train import test_time_augmentation
 from dataset import AudioDataset
-from model import AlexNet2d, AlexNet1d
+from model import AlexNet2d, AlexNet1d, ConvLSTM
 
 
 cuda = torch.cuda.is_available()
@@ -27,7 +27,7 @@ def main():
                         choices=['melgram', 'mfcc'], default='mfcc',
                         help='feature')
     parser.add_argument('--conv_type', type=str,
-                        choices=['1d', '2d'], default='2d',
+                        choices=['1d', '2d', 'lstm'], default='2d',
                         help='convolution type of the model')
     args = parser.parse_args()
 
@@ -60,6 +60,8 @@ def main():
         model = AlexNet2d(num_classes).to(device)
     elif args.conv_type == '1d':
         model = AlexNet1d(num_classes).to(device)
+    elif args.conv_type == 'lstm':
+        model = ConvLSTM(num_classes).to(device)
     else:
         print('Invalid conv_type: %s' % args.conv_type)
         exit(1)
