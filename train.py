@@ -126,7 +126,7 @@ def main():
                         choices=['melgram', 'mfcc'], default='mfcc',
                         help='feature')
     parser.add_argument('--model_type', type=str,
-                        choices=['conv1d', 'conv2d', 'lstm', 'resnet'], default='2d',
+                        choices=['alex1d', 'alex2d', 'lstm', 'resnet'], default='alex2d',
                         help='convolution type')
     parser.add_argument('--batch_size', type=int, default=128,
                         help='training and valid batch size')
@@ -219,9 +219,9 @@ def main():
     )
 
     # build model
-    if args.model_type == 'conv2d':
+    if args.model_type == 'alex2d':
         model = AlexNet2d(num_classes).to(device)
-    elif args.model_type == 'conv1d':
+    elif args.model_type == 'alex1d':
         model = AlexNet1d(num_classes).to(device)
     elif args.model_type == 'lstm':
         model = ConvLSTM(num_classes).to(device)

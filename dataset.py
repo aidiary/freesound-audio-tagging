@@ -28,7 +28,7 @@ class AudioDataset(torch.utils.data.Dataset):
 
     def __init__(self, df, wav_dir, test=False,
                  sr=None, max_length=4.0, window_size=0.02, hop_size=0.01,
-                 n_feature=64, feature='mfcc', model_type='2d'):
+                 n_feature=64, feature='mfcc', model_type='alex2d'):
         if not os.path.exists(wav_dir):
             print('ERROR: not found %s' % wav_dir)
             exit(1)
@@ -71,10 +71,10 @@ class AudioDataset(torch.utils.data.Dataset):
         data = torch.from_numpy(feature).float()
         s = data.size()
 
-        if self.model_type == 'conv2d' or self.model_type == 'resnet':
+        if self.model_type == 'alex2d' or self.model_type == 'resnet':
             # Conv2dの場合は (channel, features, frames)
             data.resize_(1, s[0], s[1])
-        elif self.model_type == 'conv1d' or self.model_type == 'lstm':
+        elif self.model_type == 'alex1d' or self.model_type == 'lstm':
             # Conv1dの場合は (features, frames)
             data.resize_(s[0], s[1])
         else:
