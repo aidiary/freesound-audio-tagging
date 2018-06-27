@@ -3,7 +3,6 @@ import argparse
 import numpy as np
 import pandas as pd
 
-from comet_ml import Experiment
 from sklearn.preprocessing import LabelEncoder
 
 import torch
@@ -19,9 +18,6 @@ from tqdm import tqdm
 
 # https://github.com/automan000/CyclicLR_Scheduler_PyTorch
 from cyclic_lr_scheduler import CyclicLR
-
-experiment = Experiment(api_key="tHRP1b8v4ZCrntHCJyu0xquwi",
-                        project_name='freesound')
 
 cuda = torch.cuda.is_available()
 if cuda:
@@ -248,15 +244,8 @@ def main():
     writer = SummaryWriter(args.log_dir)
 
     for epoch in range(1, args.epochs + 1):
-        with experiment.train():
-            loss, acc = train(train_loader, model, criterion, optimizer)
-            experiment.log_metric('loss', loss, epoch)
-            experiment.log_metric('acc', acc, epoch)
-
-        with experiment.validate():
-            val_loss, val_acc = valid(val_loader, model, criterion)
-            experiment.log_metric('loss', val_loss, epoch)
-            experiment.log_metric('acc', val_acc, epoch)
+        loss, acc = train(train_loader, model, criterion, optimizer)
+        val_loss, val_acc = valid(val_loader, model, criterion)
 
         lr_list.append(scheduler.get_lr()[0])
         scheduler.step()
