@@ -12,7 +12,7 @@ import torch.optim as optim
 from torch.utils.data.sampler import SubsetRandomSampler
 
 from dataset import AudioDataset
-from model import AlexNet2d, AlexNet1d, ConvLSTM
+from model import AlexNet2d, AlexNet1d, ConvLSTM, ResNet
 from tensorboardX import SummaryWriter
 from tqdm import tqdm
 
@@ -125,8 +125,8 @@ def main():
     parser.add_argument('--feature', type=str,
                         choices=['melgram', 'mfcc'], default='mfcc',
                         help='feature')
-    parser.add_argument('--conv_type', type=str,
-                        choices=['1d', '2d', 'lstm'], default='2d',
+    parser.add_argument('--model_type', type=str,
+                        choices=['conv1d', 'conv2d', 'lstm', 'resnet'], default='2d',
                         help='convolution type')
     parser.add_argument('--batch_size', type=int, default=128,
                         help='training and valid batch size')
@@ -143,7 +143,7 @@ def main():
 
     print('log_dir:', args.log_dir)
     print('feature:', args.feature)
-    print('conv_type:', args.conv_type)
+    print('model_type:', args.model_type)
     print('batch_size:', args.batch_size)
     print('valid_ratio:', args.valid_ratio)
     print('epochs:', args.epochs)
@@ -172,7 +172,7 @@ def main():
         train_df,
         './data/audio_train',
         feature=args.feature,
-        conv_type=args.conv_type
+        model_type=args.model_type
     )
 
     test_dataset = AudioDataset(
@@ -180,7 +180,7 @@ def main():
         './data/audio_test',
         test=True,
         feature=args.feature,
-        conv_type=args.conv_type
+        model_type=args.model_type
     )
 
     # 訓練データを訓練とバリデーションにランダムに分割
@@ -219,14 +219,16 @@ def main():
     )
 
     # build model
-    if args.conv_type == '2d':
+    if args.model_type == 'conv2d':
         model = AlexNet2d(num_classes).to(device)
-    elif args.conv_type == '1d':
+    elif args.model_type == 'conv1d':
         model = AlexNet1d(num_classes).to(device)
-    elif args.conv_type == 'lstm':
+    elif args.model_type == 'lstm':
         model = ConvLSTM(num_classes).to(device)
+    elif args.model_type == 'resnet':
+        model = ResNet([2, 2, 2, 2])
     else:
-        print('Invalid conv_type: %s' % args.conv_type)
+        print('Invalid model_type: %s' % args.model_type)
         exit(1)
 
     print(model)
