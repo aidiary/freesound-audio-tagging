@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 
 class AlexNet2d(nn.Module):
@@ -196,15 +197,17 @@ class BasicBlock(nn.Module):
         out = self.conv1(x)
         out = self.bn1(out)
         out = self.relu(out)
-
+        out = F.dropout(out)
         out = self.conv2(out)
         out = self.bn2(out)
+        out = F.dropout(out)
 
         if self.downsample is not None:
             residual = self.downsample(x)
 
         out += residual
         out = self.relu(out)
+        out = F.dropout(out)
 
         return out
 
@@ -223,8 +226,9 @@ class ResNet(nn.Module):
         self.layer1 = self._make_layer(BasicBlock, 64, layers[0])
         self.layer2 = self._make_layer(BasicBlock, 128, layers[1], stride=2)
         self.layer3 = self._make_layer(BasicBlock, 256, layers[2], stride=2)
-        self.avgpool = nn.AvgPool2d(2, stride=2)
-        self.fc = nn.Linear(6656, num_classes)
+        self.layer4 = self._make_layer(BasicBlock, 512, layers[3], stride=2)
+        self.avgpool = nn.AvgPool2d(2, stride=1)
+        self.fc = nn.Linear(6144, num_classes)
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -254,11 +258,13 @@ class ResNet(nn.Module):
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.relu(x)
+        x = F.dropout(x)
         x = self.maxpool(x)
 
         x = self.layer1(x)
         x = self.layer2(x)
         x = self.layer3(x)
+        x = self.layer4(x)
 
         x = self.avgpool(x)
         x = x.view(x.size(0), -1)
