@@ -7,7 +7,7 @@ from sklearn.preprocessing import LabelEncoder
 import torch
 from train import test_time_augmentation
 from dataset import AudioDataset
-from model import AlexNet2d, AlexNet1d, ConvLSTM
+from model import AlexNet2d, AlexNet1d, ConvLSTM, ResNet
 
 
 cuda = torch.cuda.is_available()
@@ -26,15 +26,15 @@ def main():
     parser.add_argument('--feature', type=str,
                         choices=['melgram', 'mfcc'], default='mfcc',
                         help='feature')
-    parser.add_argument('--conv_type', type=str,
-                        choices=['1d', '2d', 'lstm'], default='2d',
+    parser.add_argument('--model_type', type=str,
+                        choices=['alex1d', 'alex2d', 'lstm', 'resnet'], default='alex2d',
                         help='convolution type of the model')
     args = parser.parse_args()
 
     print('log_dir:', args.log_dir)
     print('model_file:', args.model_file)
     print('feature:', args.feature)
-    print('conv_type:', args.conv_type)
+    print('model_type:', args.model_type)
 
     # load dataset
     train_df = pd.read_csv('./data/train.csv')
@@ -56,14 +56,16 @@ def main():
     test_loader = torch.utils.data.DataLoader(test_dataset, 128, shuffle=False)
 
     # load model
-    if args.conv_type == '2d':
+    if args.model_type == 'alex2d':
         model = AlexNet2d(num_classes).to(device)
-    elif args.conv_type == '1d':
+    elif args.model_type == 'alex1d':
         model = AlexNet1d(num_classes).to(device)
-    elif args.conv_type == 'lstm':
+    elif args.model_type == 'lstm':
         model = ConvLSTM(num_classes).to(device)
+    elif args.model_type == 'resnet':
+        model = ResNet([2, 2, 2, 2])
     else:
-        print('Invalid conv_type: %s' % args.conv_type)
+        print('Invalid model_type: %s' % args.model_type)
         exit(1)
 
     print(model)
