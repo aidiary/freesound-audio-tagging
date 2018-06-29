@@ -63,7 +63,7 @@ def main():
     elif args.model_type == 'lstm':
         model = ConvLSTM(num_classes).to(device)
     elif args.model_type == 'resnet':
-        model = ResNet([2, 2, 2, 2])
+        model = ResNet([2, 2, 2, 2]).to(device)
     else:
         print('Invalid model_type: %s' % args.model_type)
         exit(1)
