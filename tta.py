@@ -50,7 +50,7 @@ def main():
         './data/audio_test',
         test=True,
         feature=args.feature,
-        conv_type=args.conv_type
+        model_type=args.model_type
     )
 
     test_loader = torch.utils.data.DataLoader(test_dataset, 128, shuffle=False)
