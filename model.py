@@ -48,7 +48,6 @@ class AlexNet2d(nn.Module):
         )
 
     def forward(self, x):
-        print(x.size())
         x = self.block1(x)
         x = self.block2(x)
         x = self.block3(x)
