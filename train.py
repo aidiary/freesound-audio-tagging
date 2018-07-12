@@ -172,7 +172,8 @@ def main():
         train_df,
         './data/audio_train',
         feature=args.feature,
-        model_type=args.model_type
+        model_type=args.model_type,
+        aug=True
     )
 
     test_dataset = AudioDataset(
@@ -180,7 +181,8 @@ def main():
         './data/audio_test',
         test=True,
         feature=args.feature,
-        model_type=args.model_type
+        model_type=args.model_type,
+        aug=False
     )
 
     # 訓練データを訓練とバリデーションにランダムに分割
