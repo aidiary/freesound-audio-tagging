@@ -24,21 +24,8 @@ def random_crop(y, max_length=176400):
     return y
 
 
-def pitch_shift(y, pitch_pm=6, sr=16000):
-    bins_per_octave = 24
-    pitch_change = pitch_pm * 2 * (np.random.uniform() - 0.5)
-    return librosa.effects.pitch_shift(y, sr, n_steps=pitch_change, bins_per_octave=bins_per_octave)
-
-
-def time_stretch(y, low=0.9, high=1.1):
-    speed_change = np.random.uniform(low=low, high=high)
-    return librosa.effects.time_stretch(y, rate=speed_change)
-
-
-def noise(y, noise_ratio=0.05):
-    random_noise = np.random.uniform(0.0, noise_ratio)
-    noise = np.random.normal(0, np.std(y) * random_noise, y.shape[0])
-    return y + noise
+def trim(y, top_db=15):
+    return librosa.effects.trim(y, top_db=top_db)[0]
 
 
 class AudioDataset(torch.utils.data.Dataset):
@@ -72,9 +59,7 @@ class AudioDataset(torch.utils.data.Dataset):
             sr = 44100
 
         if self.aug:
-            y = pitch_shift(y)
-            y = time_stretch(y)
-            y = noise(y)
+            y = trim(y)
 
         # ランダムクロップ
         y = random_crop(y, int(self.max_length * sr))
